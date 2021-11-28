@@ -1,5 +1,6 @@
 import tkinter as tk
 from objects import *
+from menu import *
 
 i = 0
 g = -1.3
@@ -7,7 +8,8 @@ dt = 1
 background = []
 objects = []
 root, space = None, None
-
+player_name = None
+#game_started = False
 
 def animation():
   global root, space, objects, background, g, dt, i
@@ -64,16 +66,17 @@ def animation():
 
 
 def main():
-  global root, space, objects, background
-  
-  root = tk.Tk()
+  global root, space, objects, background, player_name
+  #game_started = True
+  #теперь оба окна не главные и чтобы игра кончилась надо чето сделать но я устал поэтому потом 
+  root = tk.Toplevel()
   root.geometry("720x480+600+100")
-  root.title("The Last Dinasaur")
+  root.title("The Last Dinosaur")
   
   space = tk.Canvas(root, width=720, height=480, bg='black')
   space.focus_set()
   space.pack()
-  
+
   background.append(tk.PhotoImage(file='Background_up.png'))
   background.append(tk.PhotoImage(file='Background_down.png'))
   """beg1 = tk.PhotoImage(file='beg1.png')
@@ -84,7 +87,6 @@ def main():
   beg6 = tk.PhotoImage(file='beg6.png')
   beg7 = tk.PhotoImage(file='beg7.png')
   beg8 = tk.PhotoImage(file='beg8.png')"""
-  
   
   
   
@@ -112,4 +114,4 @@ def main():
   
 
 if __name__== "__main__":
-  main()
+  open_menu()
