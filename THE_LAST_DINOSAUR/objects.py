@@ -20,13 +20,19 @@ class Dino():
         
     def move_left(self, dt):
         
-        self.vx = -10
-        self.x += self.vx * dt
+        if self.x >= 5:
+            self.vx = -10
+            self.x += self.vx * dt
+        else:
+            pass
         
     def move_right(self, dt):
         
-        self.vx = 10
-        self.x += self.vx * dt    
+        if self.x <= 715:
+            self.vx = 10
+            self.x += self.vx * dt
+        else:
+            pass
         
     def jump(self, dt, g):
         
