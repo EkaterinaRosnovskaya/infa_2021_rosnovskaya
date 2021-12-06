@@ -1,18 +1,22 @@
 import tkinter as tk
 from objects import *
 from menu import *
+from random import *
 
 i = 0
-g = -1.3
+length = 0
+g = -10
 dt = 1
 background = []
 objects = []
+floors = []
+carl_home = []
 root, space = None, None
 player_name = None
 #game_started = False
 
 def animation():
-  global root, space, objects, background, g, dt, i
+  global root, space, objects, background, g, dt, i, floors, carl_home
 
   i+=1
   
@@ -20,15 +24,11 @@ def animation():
   
   space.create_image(600 - 2.5*i %855, 240, image=background[0])
   space.create_image(600 - 5*i %855, 240, image=background[1])
-  
-  """if 1 <= i <= 50:
-    space.create_image(360, 240, image=beg1)
-  elif 51 <= i <= 58:
-    space.create_image(360, 240, image=beg2)
-  elif 59 <= i <= 65:
-    space.create_image(360, 240, image=beg2)"""    
+     
   
   for obj in objects:
+
+    
     if (obj.type_ == "dino"):
       if i % 14 == 1 or i % 14 == 2:
         space.create_image(obj.x, obj.y, image=obj.img1)
@@ -46,32 +46,72 @@ def animation():
         space.create_image(obj.x, obj.y, image=obj.img7)
         
       if obj.right_flag == 1:
-
         obj.move_right(dt)
         
       if obj.left_flag == 1:
         obj.move_left(dt)
-        
-      if obj.y < 385:
-       obj.jump(dt, g)
-       obj.vy = obj.vy + g * dt
-      elif obj.y >= 380: 
-        obj.vy = 10
-        obj.y = 385
+
+      for floor in floors:
         
       
-  
+       obj.change_of_level_test(floor)
+       if obj.start_y <= floor.y and obj.y <= floor.y:
+         obj.return_of_level_test(floor)
+         obj.return_of_level_test_1(floor)
+         
+       else:
+         floor.fall_flag = 0
+        
+       
+
+      if obj.jump_flag == 1:
+        obj.jump(dt, g)
+        if obj.y >= obj.start_y:
+          obj.jump_flag = 0
+          obj.vy = 50
+      elif obj.jump_flag == 0:
+        pass
+      
+      if obj.fall_flag == 1 and obj.y < obj.start_y:
+        obj.fall(dt,g)
+        if obj.y >= obj.start_y:
+          obj.fall_flag = 0
+          obj.fall_vy = 0
+        
+      
+      if obj.start_y == 385 and obj.y > 385:
+        obj.y = 385
+        
+        if obj.start_y == 300 and obj.y > 300:
+          obj.y = 300      
+      
+      
+    
+    elif (obj.type_ == "floor"):
+      
+      obj.x -= 5
+      space.create_image(obj.x + obj.length/2, obj.y+15, image = obj.pic)
+      if obj.x + obj.length < 0:
+        obj.x = 720
+      if obj.number == 1:
+        obj.free_mind(floors[1], floors[2], carl_home[0])
+      
+      
+
+    
   space.after(40, animation)
 
 
 
-def main():
+def main(rt):
   global root, space, objects, background, player_name
   #game_started = True
   #теперь оба окна не главные и чтобы игра кончилась надо чето сделать но я устал поэтому потом 
-  root = tk.Toplevel()
-  root.geometry("720x480+600+100")
-  root.title("The Last Dinosaur")
+  #root = tk.Toplevel()
+  #root.geometry("720x480+100+100")
+  #root.title("The Last Dinosaur")
+
+  root = rt
   
   space = tk.Canvas(root, width=720, height=480, bg='black')
   space.focus_set()
@@ -79,14 +119,7 @@ def main():
 
   background.append(tk.PhotoImage(file='Background_up.png'))
   background.append(tk.PhotoImage(file='Background_down.png'))
-  """beg1 = tk.PhotoImage(file='beg1.png')
-  beg2 = tk.PhotoImage(file='beg2.png')
-  beg3 = tk.PhotoImage(file='beg3.png')
-  beg4 = tk.PhotoImage(file='beg4.png')
-  beg5 = tk.PhotoImage(file='beg5.png')
-  beg6 = tk.PhotoImage(file='beg6.png')
-  beg7 = tk.PhotoImage(file='beg7.png')
-  beg8 = tk.PhotoImage(file='beg8.png')"""
+  
   
   
   
@@ -94,9 +127,27 @@ def main():
   
   carl = Dino(x_0 = 20, y_0 = 385)
   objects.append(carl)
+  carl_home.append(carl)
+
+  floor1 = Floor(1)
+  objects.append(floor1)
+  floors.append(floor1)
+
+  floor2 = Floor(2)
+  objects.append(floor2)
+  floors.append(floor2)
+
+  floor3 = Floor(3)
+  objects.append(floor3)
+  floors.append(floor3)
+
+
+
   
   space.bind('<Up>', 
-          lambda event: carl.jump(dt, g))
+          lambda event: carl.change_jump_flag(1))
+  #space.bind('<Up>', 
+          #lambda event: carl.change_of_level_and_jump(dt, g,))
   """space.bind('<Down>', 
          lambda event: carl.move(0, 20))"""
   space.bind('<Left>', 
@@ -110,7 +161,7 @@ def main():
   
   
   animation()
-  root.mainloop()
+  #root.mainloop()
   
 
 if __name__== "__main__":
